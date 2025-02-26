@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  wx200_ros:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wx200_ros
+    # Enable GUI applications if needed
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      # Mount your local code directory to the container
+      - ./src:/root/catkin_ws/src
+      # For GUI applications on macOS (may require XQuartz)
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # For device access (USB for robot)
+      - /dev:/dev
+    devices:
+      # Explicitly map USB devices - helps with compatibility
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyACM0:/dev/ttyACM0
+    privileged: true # Needed for hardware access
+    # Use ports instead of network_mode: "host" for better cross-platform compatibility
+    ports:
+      - "11311:11311" # ROS master
+      - "9090:9090" # ROS bridge (if needed)
+    command: bash
+    # Keep the container running
+    tty: true
+    stdin_open: true
