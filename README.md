@@ -76,6 +76,9 @@ chmod +x setup.sh
 
 Once inside the container, you can run the example Python script:
 
+
+Note: wx200_control.py is in ~/catkin_ws/src/wx200_robot/wx200_control/scripts
+
 ```bash
 cd /root/catkin_ws
 rosrun wx200_control wx200_control.py
