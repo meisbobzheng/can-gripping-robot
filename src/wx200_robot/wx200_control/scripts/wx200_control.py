@@ -1,21 +1,33 @@
 #!/usr/bin/env python3
 """
-Example script for controlling the WX200 robot arm using ROS and Python.
+Example script for controlling the WX250 robot arm using ROS and Python.
 This script should be run inside the Docker container.
+
+USAGE:
+  - Make sure to run 'roscore' in a separate terminal before running this script
+  - Press Ctrl+C at any time to safely exit
 """
 
 import rospy
 import sys
 import time
+import signal
 from std_msgs.msg import Float64
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
 
-class WX200Controller:
+# Setup signal handler for clean exits
+def signal_handler(sig, frame):
+    print("\nReceived shutdown signal. Exiting gracefully...")
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+class WX250Controller:
     def __init__(self):
         try:
             # Initialize the ROS node with a timeout
-            rospy.init_node('wx200_controller_node', anonymous=True)
+            rospy.init_node('wx250_controller_node', anonymous=True)
             
             # Check if ROS master is running, with a timeout
             if not self._wait_for_master(timeout=5):
@@ -24,22 +36,22 @@ class WX200Controller:
                 return
             
             # Set up publishers for joint control
-            # These topics need to match what your WX200 ROS driver expects
-            self.joint1_pub = rospy.Publisher('/wx200/joint1_position_controller/command', Float64, queue_size=10)
-            self.joint2_pub = rospy.Publisher('/wx200/joint2_position_controller/command', Float64, queue_size=10)
-            self.joint3_pub = rospy.Publisher('/wx200/joint3_position_controller/command', Float64, queue_size=10)
-            self.joint4_pub = rospy.Publisher('/wx200/joint4_position_controller/command', Float64, queue_size=10)
-            self.joint5_pub = rospy.Publisher('/wx200/joint5_position_controller/command', Float64, queue_size=10)
-            self.gripper_pub = rospy.Publisher('/wx200/gripper_position_controller/command', Float64, queue_size=10)
+            # These topics may need adjustment for your specific WX250 ROS driver
+            self.waist_pub = rospy.Publisher('/wx250/waist_controller/command', Float64, queue_size=10)
+            self.shoulder_pub = rospy.Publisher('/wx250/shoulder_controller/command', Float64, queue_size=10)
+            self.elbow_pub = rospy.Publisher('/wx250/elbow_controller/command', Float64, queue_size=10)
+            self.wrist_angle_pub = rospy.Publisher('/wx250/wrist_angle_controller/command', Float64, queue_size=10)
+            self.wrist_rotate_pub = rospy.Publisher('/wx250/wrist_rotate_controller/command', Float64, queue_size=10)
+            self.gripper_pub = rospy.Publisher('/wx250/gripper_controller/command', Float64, queue_size=10)
             
             # Set up a subscriber to get current joint states
             self.joint_states = None
-            rospy.Subscriber('/wx200/joint_states', JointState, self.joint_states_callback)
+            rospy.Subscriber('/wx250/joint_states', JointState, self.joint_states_callback)
             
             # Wait for connections to be established
             rospy.sleep(1)
             
-            print("WX200 controller initialized")
+            print("WX250 controller initialized")
             self.initialized = True
         except rospy.ROSInitException as e:
             print(f"Error initializing ROS node: {e}")
@@ -54,7 +66,7 @@ class WX200Controller:
         try:
             start_time = time.time()
             while not rospy.is_shutdown() and (time.time() - start_time) < timeout:
-                if rospy.core.is_initialized():
+                if rospy.core.is_initialized() and rospy.core.get_master():
                     return True
                 print("Waiting for ROS master... Press Ctrl+C to exit.")
                 time.sleep(1)
@@ -72,18 +84,19 @@ class WX200Controller:
         Move the robot to specified joint positions
         
         Args:
-            positions (list): List of 6 joint angles in radians [joint1, joint2, joint3, joint4, joint5, gripper]
+            positions (list): List of 6 joint angles in radians 
+                             [waist, shoulder, elbow, wrist_angle, wrist_rotate, gripper]
         """
         if len(positions) != 6:
             rospy.logerr("Expected 6 joint positions")
             return
         
         # Publish each joint position
-        self.joint1_pub.publish(Float64(positions[0]))
-        self.joint2_pub.publish(Float64(positions[1]))
-        self.joint3_pub.publish(Float64(positions[2]))
-        self.joint4_pub.publish(Float64(positions[3]))
-        self.joint5_pub.publish(Float64(positions[4]))
+        self.waist_pub.publish(Float64(positions[0]))
+        self.shoulder_pub.publish(Float64(positions[1]))
+        self.elbow_pub.publish(Float64(positions[2]))
+        self.wrist_angle_pub.publish(Float64(positions[3]))
+        self.wrist_rotate_pub.publish(Float64(positions[4]))
         self.gripper_pub.publish(Float64(positions[5]))
         
         # Give the robot time to move
@@ -93,33 +106,38 @@ class WX200Controller:
 
     def open_gripper(self):
         """Open the gripper"""
-        self.gripper_pub.publish(Float64(0.0))  # Adjust value as needed for your gripper
+        self.gripper_pub.publish(Float64(2.0))  # Adjust value as needed for your gripper
         rospy.sleep(1)
         print("Gripper opened")
 
     def close_gripper(self):
         """Close the gripper"""
-        self.gripper_pub.publish(Float64(1.0))  # Adjust value as needed for your gripper
+        self.gripper_pub.publish(Float64(0.0))  # Adjust value as needed for your gripper
         rospy.sleep(1)
         print("Gripper closed")
 
     def home_position(self):
         """Move the robot to a predefined home position"""
-        home_joints = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # Adjust these values for your robot
+        # WX250 home position - adjust these values based on your setup
+        home_joints = [0.0, -1.5, 1.5, 0.0, 0.0, 0.0]
         self.move_to_joint_position(home_joints)
         print("Robot moved to home position")
+
+    def sleep_position(self):
+        """Move the robot to a safe position for storage"""
+        # WX250 sleep/storage position - adjust as needed
+        sleep_joints = [0.0, -1.9, 1.55, 0.8, 0.0, 0.0]
+        self.move_to_joint_position(sleep_joints)
+        print("Robot moved to sleep position")
 
     def pick_and_place_demo(self):
         """Demonstrate a simple pick and place operation"""
         # Move to approach position
-        approach_pos = [0.0, 0.5, 0.5, 0.0, 0.3, 0.0]
+        approach_pos = [0.0, -0.8, 1.0, 0.5, 0.0, 2.0]  # Gripper open
         self.move_to_joint_position(approach_pos)
         
-        # Open gripper
-        self.open_gripper()
-        
         # Move to pick position
-        pick_pos = [0.0, 0.7, 0.7, 0.0, 0.3, 0.0]
+        pick_pos = [0.0, -0.5, 0.5, 0.5, 0.0, 2.0]
         self.move_to_joint_position(pick_pos)
         
         # Close gripper
@@ -129,7 +147,7 @@ class WX200Controller:
         self.move_to_joint_position(approach_pos)
         
         # Move to place position
-        place_pos = [1.0, 0.5, 0.5, 0.0, 0.3, 0.0]
+        place_pos = [1.5, -0.8, 1.0, 0.5, 0.0, 0.0]
         self.move_to_joint_position(place_pos)
         
         # Open gripper
@@ -143,10 +161,10 @@ class WX200Controller:
 def main():
     try:
         # Add timeout for the entire script
-        print("Starting WX200 controller...")
+        print("Starting WX250 controller...")
         print("Press Ctrl+C at any time to exit safely.")
         
-        controller = WX200Controller()
+        controller = WX250Controller()
         
         # Only proceed if initialization was successful
         if hasattr(controller, 'initialized') and controller.initialized:
@@ -157,6 +175,9 @@ def main():
             
             # Run a pick and place demo
             controller.pick_and_place_demo()
+            
+            # Return to sleep position
+            controller.sleep_position()
         else:
             print("\nController initialization failed. Cannot proceed.")
             print("Make sure ROS master is running with 'roscore' in another terminal.")
