@@ -66,7 +66,10 @@ class WX250Controller:
         try:
             start_time = time.time()
             while not rospy.is_shutdown() and (time.time() - start_time) < timeout:
-                if rospy.core.is_initialized() and rospy.core.get_master():
+                master = rospy.get_master()
+                print("master uri: " , master[0])
+                print("master port:" , master[1])
+                if rospy.core.is_initialized():
                     return True
                 print("Waiting for ROS master... Press Ctrl+C to exit.")
                 time.sleep(1)
