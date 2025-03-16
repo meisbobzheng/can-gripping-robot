@@ -15,12 +15,9 @@ services:
       - ./src:/root/catkin_ws/src
       # For GUI applications on macOS (may require XQuartz)
       - /tmp/.X11-unix:/tmp/.X11-unix
-      # For device access (USB for robot)
-      - /dev:/dev
     devices:
       # Explicitly map USB devices - helps with compatibility
-      - /dev/ttyUSB0:/dev/ttyUSB0
-      - /dev/ttyACM0:/dev/ttyACM0
+      - /dev/bus/usb:/dev/bus/usb
     privileged: true # Needed for hardware access
     # Use ports instead of network_mode: "host" for better cross-platform compatibility
     ports:
