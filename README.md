@@ -7,13 +7,33 @@ Range for all coords: -.75 to .75
 +Z is above robot
 
 Z = .2 is a good height off ground to be grabbing a can.
+If Z is less than .2, arm will probably go into the ground since 0 axis is roughly at the floor
 
 X,Y .5 range around the robot would be a good maximum range for cans to be placed on table ?
 
 Base: (0,0,0) coordinates is roughly where the "-" is in the name on the robot
 
-Questions for Prof:
-1. Why is y = .4, y = -.4 seem like the same position?
-2. Where to place camera? (Above, on end effector.)
-   - If it's above, we can't see what kind of can it is - would need 2 cameras?
-    - But x,y, pos would be much easier to calculate from above.
+
+### Getting Environment Setup:
+
+1. Create Ubuntu 22.04 VM in VMWare Fusion (if on Mac)
+2. Install Ros on VM 
+3. Follow this video to intstall interbotix:
+   https://www.youtube.com/watch?v=kZx2tNVfQAQ&list=PL8X3t2QTE54sMTCF59t0pTFXgAmdf0Y9t&index=5&ab_channel=TrossenRobotics
+   - When installing interbotix, I had an error about dynamixel, and had to run this command, and then install again:
+      - sudo apt install ros-humble-dynamixel-sdk
+4. You will now have an interbotix_ws directory on your VM containing a bunch of useful files and stuff
+
+### To connect to Robot:
+1. ros2 launch interbotix_xsarm_control xsarm_control.launch.py robot_model:=wx250
+   - Type in "wx250" in name in RViZ and select "arm" from the drop down
+   - Should now be able to go into sleep or home pose
+   - ** Ensure USB connection is going through to VM, and may need to link ttyDXL to USB file if it isn't properly recognized:
+      -To do so, go to /dev directory and run: ln -s ttyUSB0 ttyDXL
+2. Run any of the scripts in demos.py (Be careful of bartender.py it makes the arm move real fast), and they should work
+
+### Useful stuff
+ This github has most of the relevant code to moving the robot
+ set_ee_pose(x,y,z,yaw,pitch,roll) seems most useful
+ gripper.py has useful functions for gripper
+      
