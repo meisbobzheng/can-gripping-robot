@@ -36,4 +36,7 @@ Base: (0,0,0) coordinates is roughly where the "-" is in the name on the robot
  This github has most of the relevant code to moving the robot
  set_ee_pose(x,y,z,yaw,pitch,roll) seems most useful
  gripper.py has useful functions for gripper
+
+### The whole interbotix repo (Which will be installed on your VM after installing interbotix):
+https://github.com/Interbotix/interbotix_ros_manipulators/blob/0bb2b0e6d0e619bff02cf74dbd5af5681dcf80c9/interbotix_ros_uxarms/examples/python_demos/joint_position_control.py
       
