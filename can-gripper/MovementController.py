@@ -9,6 +9,9 @@ class MovementController:
     def move_to(self, position):
         pass
 
+    def pick_up_can(self):
+        pass
+
     def return_to_home(self):
         pass
 
