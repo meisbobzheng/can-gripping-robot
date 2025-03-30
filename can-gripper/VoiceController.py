@@ -1,95 +1,63 @@
 import speech_recognition as sr
 
 class VoiceController:
-    def __init__(self, model=None):
-        self.model = model  # if you need it for other purposes
+    def __init__(self):
         self.recognizer = sr.Recognizer()
         self.mic = sr.Microphone()
+        self.exit_keywords = ["cancel", "exit"]
 
-    def listen_until_keyword(self, keyword):
+    def listen_for_initial_command(self, trigger: str, keywords: list[str]) -> str | None:
         """
-        Listens continuously and stops when a keyword is detected.
-        :param keywords: list of keywords to match against (lowercase strings)
+        Listens for an initial trigger phrase (e.g., 'hey robot'), then a follow-up sentence
+        that contains one of the target keywords. If 'cancel' or 'exit' is heard, it resets.
+
+        :param trigger: trigger phrase to start the keyword listener
+        :param keywords: list of command keywords to match in follow-up
+        :return: matched keyword if found, or None if canceled or error
         """
-        print("Listening for keyword:", keyword)
+        all_keywords = [kw.lower() for kw in keywords + self.exit_keywords]
 
         with self.mic as source:
             self.recognizer.adjust_for_ambient_noise(source)
 
             while True:
-                print("Say something...")
-                audio = self.recognizer.listen(source)
-                
-                try:
-                    result = self.recognizer.recognize_sphinx(audio, keyword_entries=[(keyword, 1.0)])
-                    print(f"Detected keyword: {result}")
-                    return result
-                except sr.UnknownValueError:
-                    print("Didn't catch that.")
-                    continue
-                except sr.RequestError as e:
-                    print(f"PocketSphinx error: {e}")
-                    return None
-
-    def listen_for_initial_command(self, trigger, keywords) -> str | None:
-        """
-        Listens for an initial command that triggers the main listening loop.
-        Resets to trigger if 'cancel' or 'exit' is detected.
-        
-        :param trigger: the initial command to listen for
-        :param keywords: list of keywords to match against (lowercase strings)
-        :return: the matched keyword, or None if an error occurs
-        """
-        exit_keywords = ["cancel", "exit"]
-        all_keywords = keywords + exit_keywords
-
-        print("Listening for initial command...")
-
-        with self.mic as source:
-            self.recognizer.adjust_for_ambient_noise(source)
-
-            while True:
-                # Listen for the trigger word
+                # Step 1: Listen for the trigger
+                print(f"Listening for trigger phrase: '{trigger}'...")
                 while True:
-                    print(f"Listening for trigger word: {trigger}")
                     audio = self.recognizer.listen(source)
-
                     try:
-                        result = self.recognizer.recognize_sphinx(audio, keyword_entries=[(trigger, 1.0)])
-                        print(f"Trigger word detected: {result}")
-                        break  # enter keyword listening loop
+                        result = self.recognizer.recognize_google(audio)
+                        print(f"Heard: {result}")
+
+                        if trigger.lower() in result.lower():
+                            print("Trigger detected.")
+                            break
                     except sr.UnknownValueError:
                         print("Didn't catch that.")
                         continue
                     except sr.RequestError as e:
-                        print(f"PocketSphinx error: {e}")
+                        print(f"Google error: {e}")
                         return None
 
-                # Now listen for keywords
+                # Step 2: Listen for follow-up sentence
+                print("Listening for follow-up command...")
                 while True:
-                    print("Listening for keywords...")
                     audio = self.recognizer.listen(source)
-
                     try:
-                        result = self.recognizer.recognize_sphinx(audio, keyword_entries=[(kw, 1.0) for kw in all_keywords])
-                        print(f"Detected keyword: {result}")
+                        result = self.recognizer.recognize_google(audio)
+                        print(f"Heard follow-up: {result}")
+                        spoken = result.lower()
 
-                        if result.lower() in exit_keywords:
-                            print(f"Resetting due to keyword: {result}")
-                            break  # go back to listening for trigger
-
-                        return result  # matched actual keyword
+                        for kw in all_keywords:
+                            if kw in spoken:
+                                if kw in self.exit_keywords:
+                                    print(f"Keyword '{kw}' triggered reset.")
+                                    break  # go back to listening for trigger
+                                print(f"Matched keyword: {kw}")
+                                return kw
                     except sr.UnknownValueError:
                         print("Didn't catch that.")
                         continue
                     except sr.RequestError as e:
-                        print(f"PocketSphinx error: {e}")
+                        print(f"Google error: {e}")
                         return None
-
-                
-
-
-if __name__ == "__main__":
-    vc = VoiceController()
-    keyword = vc.listen_for_initial_command("hey robot", ["coca-cola", "sprite", "pepsi", "root-beer"])
-    print(f"Matched keyword: {keyword}")
