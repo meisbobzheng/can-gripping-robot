@@ -9,13 +9,13 @@ class RobotMain:
     def __init__(self):
         # voice stuff
         self.voice_controller = vc.VoiceController()
+        print("Voice controller initialized.")
+
         # soda stuff
         self.soda_controller = sc.SodaController()
         self.soda_list = self.soda_controller.get_soda_list()
-        print(self.soda_list)
-
-    def __str__(self):
-        return f"RobotMain({self.soda_list})"
+        print("Soda controller initialized.")
+        print("Soda list:", self.soda_list)
     
     # first step
     def listen_and_identify_soda(self):
@@ -60,6 +60,4 @@ class RobotMain:
 
 if __name__ == '__main__':
     robot = RobotMain()
-
-    print(robot)
     robot.main()
