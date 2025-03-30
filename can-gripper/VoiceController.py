@@ -6,12 +6,12 @@ class VoiceController:
         self.recognizer = sr.Recognizer()
         self.mic = sr.Microphone()
 
-    def listen_until_keywords(self, keywords):
+    def listen_until_keyword(self, keyword):
         """
         Listens continuously and stops when a keyword is detected.
         :param keywords: list of keywords to match against (lowercase strings)
         """
-        print("Listening for keywords:", keywords)
+        print("Listening for keyword:", keyword)
 
         with self.mic as source:
             self.recognizer.adjust_for_ambient_noise(source)
@@ -19,21 +19,17 @@ class VoiceController:
             while True:
                 print("Say something...")
                 audio = self.recognizer.listen(source)
-
+                
                 try:
-                    result = self.recognizer.recognize_sphinx(audio)
-                    print(f"You said: {result}")
-
-                    # check if any keyword is in the spoken result
-                    for keyword in keywords:
-                        if keyword.lower() in result.lower():
-                            print(f"Keyword '{keyword}' detected! Stopping...")
-                            return result
-
+                    result = self.recognizer.recognize_sphinx(audio, keyword_entries=[(keyword, 1.0)])
+                    print(f"Detected keyword: {result}")
+                    return result
                 except sr.UnknownValueError:
                     print("Didn't catch that.")
+                    continue
                 except sr.RequestError as e:
                     print(f"PocketSphinx error: {e}")
+                    return None
 
     def listen_for_initial_command(self, trigger, keywords) -> str | None:
         """
