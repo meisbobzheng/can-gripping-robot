@@ -1,6 +1,9 @@
 import speech_recognition as sr
 
 class VoiceController:
+    """
+    VoiceController class for listening to and processing voice commands.
+    """
     def __init__(self):
         self.recognizer = sr.Recognizer()
         self.mic = sr.Microphone()

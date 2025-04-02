@@ -1,4 +1,7 @@
 class MovementController:
+    """
+    Controller for the robot arm, and all movement. 
+    """
     def __init__(self, model):
         self.model = model
 

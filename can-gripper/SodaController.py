@@ -1,10 +1,14 @@
-from enum import Enum
+
 
 class SodaController:
+    """
+    All of the soda values are stored here, with translations to commands for the vision model. 
+    """
+
     SPRITE = "sprite"
     COKE = "coca-cola"
     PEPSI = "pepsi"
-    FANTA = "fanta"
+    FANTA = "fanta" 
     ROOT_BEER = "root beer"
 
     def get_soda_list(self) -> list[str] :

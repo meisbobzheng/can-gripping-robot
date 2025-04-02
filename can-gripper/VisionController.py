@@ -1,5 +1,8 @@
 
 class VisionController:
+    """
+    Vision controller for processing inputs and finding the can
+    """
     def __init__(self, vision):
         self.vision = vision
 
