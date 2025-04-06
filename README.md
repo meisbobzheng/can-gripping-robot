@@ -48,3 +48,14 @@ For speech recognition, you will need PyAudio (google how to install) for microp
 
 - ⚠️ On some systems (especially Windows), installing pyaudio via pip might fail. You can download a precompiled wheel from here and install it using pip install <filename>.whl.
 - This is for voice recognition: https://github.com/Uberi/speech_recognition/tree/master
+
+### Robot movement plan: 
+- From home position, move to scout position
+- Scan 360 degrees (8 quadrants) and take images of each position
+- Determine the quadrant with the highest confidence
+- Move in scout position to that angle
+- Center the bounding box
+- Calculate distance of can 
+- Move scout in a linear motion towards the can
+- Grip
+- Go back to home position
