@@ -1,5 +1,4 @@
 from transformers import Owlv2Processor, Owlv2ForObjectDetection
-from transformers.utils.constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD
 
 import torch
 import cv2
@@ -9,8 +8,7 @@ class VisionController:
     """
     Vision controller for processing inputs and finding the can
     """
-    def __init__(self, vision):
-        self.vision = vision
+    def __init__(self):
         self.cap = cv2.VideoCapture(1)
         self.processor = Owlv2Processor.from_pretrained("google/owlv2-base-patch16-ensemble")
         self.model = Owlv2ForObjectDetection.from_pretrained("google/owlv2-base-patch16-ensemble")

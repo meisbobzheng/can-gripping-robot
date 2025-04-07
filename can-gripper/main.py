@@ -37,9 +37,6 @@ class RobotMain:
     
     def main(self):
 
-
-
-
         # main loop
         while True:
             try :
