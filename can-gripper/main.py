@@ -1,5 +1,6 @@
 import VoiceController as vc
 import SodaController as sc
+import VisionController as visc
 
 class RobotMain:
     """
@@ -10,6 +11,10 @@ class RobotMain:
         # voice stuff
         self.voice_controller = vc.VoiceController()
         print("Voice controller initialized.")
+
+        # vision stuff
+        self.vision_controller = visc.VisionController()
+        print("Vision controller initialized.")
 
         # soda stuff
         self.soda_controller = sc.SodaController()
@@ -31,6 +36,10 @@ class RobotMain:
             return soda
     
     def main(self):
+
+
+
+
         # main loop
         while True:
             try :
