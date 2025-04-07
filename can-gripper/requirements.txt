@@ -2,7 +2,6 @@ SpeechRecognition
 pocketsphinx
 pyaudio
 transformers
-PIL
 torch
 numpy
-cv2
+opencv-python

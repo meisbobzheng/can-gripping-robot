@@ -1,6 +1,5 @@
 from transformers import Owlv2Processor, Owlv2ForObjectDetection
 from transformers.utils.constants import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD
-from PIL import ImageDraw, Image
 
 import torch
 import cv2
