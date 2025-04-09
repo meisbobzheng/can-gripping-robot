@@ -67,3 +67,16 @@ class RobotMain:
 if __name__ == '__main__':
     robot = RobotMain()
     robot.main()
+
+
+"""
+This script makes the end-effector go to a specific pose by defining the pose components
+
+To get started, open a terminal and type:
+
+    ros2 launch interbotix_xsarm_control xsarm_control.launch robot_model:=wx250
+
+Then change to this directory and type:
+
+    python3 ee_pose_components.py
+"""
