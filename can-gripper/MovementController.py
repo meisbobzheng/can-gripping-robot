@@ -6,8 +6,22 @@ class MovementController:
     """
     Controller for the robot arm, and all movement. 
     """
-    def __init__(self, model):
-        self.model = model
+    def __init__(self):
+        self.bot = InterbotixManipulatorXS(
+            robot_model="wx250",
+            group_name="arm",
+            gripper_name="gripper",)
+        
+    def startup(self) -> None:
+        robot_startup()
+        self.bot.arm.go_to_home_pose()
+        print("robot moved to home")
+
+    def shutdown(self) -> None:
+        self.bot.arm.go_to_home_pose()
+        robot_shutdown()
+        print("robot is going to sleep")
+
 
     # Extneds the arm forward to (kind of the distance, not sure units)
     def extend_arm_forward(distance):
@@ -47,3 +61,4 @@ class MovementController:
 
         pos_y = (can_y / can_x) * percent_x_pos + 0
         return percent_x_pos, pos_y
+
