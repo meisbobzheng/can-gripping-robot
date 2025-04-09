@@ -11,6 +11,7 @@ class MovementController:
 
     # Extneds the arm forward to (kind of the distance, not sure units)
     def extend_arm_forward(distance):
+        pass
 
     def extend(self):
         # full extension
