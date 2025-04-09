@@ -67,6 +67,62 @@ def calculate_first_pos(can_x, can_y):
     return percent_x_pos, pos_y
 
 
+def scout_pos():
+    x_pos = 0.5
+    y_pos = 0.0
+    z_pos = 0.2
+
+    # first_x_pos, first_y_pos = calculate_first_pos(x_pos, y_pos)
+
+    bot = InterbotixManipulatorXS(
+        robot_model="wx250",
+        group_name="arm",
+        gripper_name="gripper",
+    )
+
+    robot_startup()
+
+    # bot.arm.go_to_home_pose()
+
+    # first_pos = bot.arm.set_ee_pose_components(x=x_pos, y=y_pos, z=z_pos, execute=True)
+    # curr_joints = first_pos[0]
+
+    # adjust shoulder and elbow to move end effector straight down
+    shoulder_index = bot.arm.info_index_map["shoulder"]
+    elbow_index = bot.arm.info_index_map["elbow"]
+    wrist_rotate_index = bot.arm.info_index_map["wrist_rotate"]
+    wrist_angle_index = bot.arm.info_index_map["wrist_angle"]
+
+    # curr_joints[shoulder_index] = math.pi / 4.4
+    # curr_joints[elbow_index] = math.pi / 4
+
+    # flatten wrist to be parallel
+    # wrist angle to look up at - maybe calculate, maybe can just cheat and hard code
+    wrist_rotate_angle = math.pi / 2
+    wrist_angle = -math.pi / 70
+    # - twists it right
+
+    # curr_joints[wrist_rotate_index] = wrist_rotate_angle
+    # curr_joints[wrist_angle_index] = wrist_angle
+    bot.arm.go_to_sleep_pose()
+
+    scout_joints_from_sleep = bot.arm.get_joint_positions()
+    scout_joints_from_sleep[wrist_rotate_index] = wrist_rotate_angle
+    scout_joints_from_sleep[wrist_angle_index] = wrist_angle
+
+    scout_joints_from_sleep[elbow_index] = math.pi / 2.5
+    scout_joints_from_sleep[shoulder_index] = math.pi / 8
+    print(scout_joints_from_sleep)
+    bot.arm.set_joint_positions(scout_joints_from_sleep)
+    print("scouting")
+
+    bot.arm.set_single_joint_position("waist", math.pi / 2)
+    # extend wrist outwrist_rotate_angle
+
+    bot.arm.go_to_sleep_pose()
+    robot_shutdown()
+
+
 def main():
 
     # These will be an input from the camera telling us where the can is
@@ -88,8 +144,6 @@ def main():
     wrist_rotate_angle = math.pi / 4
 
     wrist_angle = math.pi / 5
-
-    first_guess = [0, 0, 0, wrist_angle, wrist_rotate_angle]
 
     bot.arm.go_to_home_pose()
 
@@ -125,4 +179,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    scout_pos()
