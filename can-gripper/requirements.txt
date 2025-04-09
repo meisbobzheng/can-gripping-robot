@@ -1,7 +1,7 @@
 SpeechRecognition
 pocketsphinx
 pyaudio
-transformers
-torch
+transformers==4.50.0
+torch==2.6.0
 numpy
 opencv-python
