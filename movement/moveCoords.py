@@ -67,7 +67,6 @@ def calculate_first_pos(can_x, can_y):
     return percent_x_pos, pos_y
 
 
-
 def scout_pos():
     # adjust shoulder and elbow to move end effector straight down
     shoulder_index = bot.arm.info_index_map["shoulder"]
@@ -93,13 +92,27 @@ def scout_pos():
     bot.arm.set_joint_positions(scout_joints_from_sleep)
     print("scouting")
 
+
 # Rotate waist by an angle (radian)
 # positive is left, negative is right
 def rotate_waist(angle):
     bot.arm.set_single_joint_position("waist", angle)
 
-def extend_arm(distance):
 
+def extend_arm():
+    curr_joints = bot.arm.get_joint_positions()
+
+    old_joints = curr_joints
+
+    shoulder_index = bot.arm.info_index_map["shoulder"]
+    elbow_index = bot.arm.info_index_map["elbow"]
+
+    curr_joints[shoulder_index] = math.pi / 5
+    curr_joints[elbow_index] = math.pi / 4
+
+    bot.arm.set_joint_positions(curr_joints)
+
+    print("extending arm")
 
 
 if __name__ == "__main__":
@@ -115,7 +128,8 @@ if __name__ == "__main__":
     # Go to scout pos
     scout_pos()
 
-    # Rot
+    # rotate_waist(-math.pi / 2)
 
+    extend_arm()
 
     robot_shutdown()
