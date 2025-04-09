@@ -30,9 +30,11 @@ class VoiceController:
                     audio = self.recognizer.listen(source)
                     try:
                         result = self.recognizer.recognize_google(audio)
-                        print(f"Heard: {result}")
+                        lowercase_phrase = result.lower()
 
-                        if trigger.lower() in result.lower():
+                        print(f"Heard: {lowercase_phrase}")
+
+                        if trigger.lower() in lowercase_phrase:
                             print("Trigger detected.")
                             break
                     except sr.UnknownValueError:
@@ -48,8 +50,9 @@ class VoiceController:
                     audio = self.recognizer.listen(source)
                     try:
                         result = self.recognizer.recognize_google(audio)
-                        print(f"Heard follow-up: {result}")
                         spoken = result.lower()
+                        
+                        print(f"Heard follow-up: {spoken}")
 
                         for kw in all_keywords:
                             if kw in spoken:

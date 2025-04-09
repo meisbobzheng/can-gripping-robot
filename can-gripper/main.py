@@ -1,6 +1,6 @@
 import VoiceController as vc
 import SodaController as sc
-import VisionController as visc
+#import VisionController as visc
 
 class RobotMain:
     """
@@ -13,8 +13,8 @@ class RobotMain:
         print("Voice controller initialized.")
 
         # vision stuff
-        self.vision_controller = visc.VisionController()
-        print("Vision controller initialized.")
+        # self.vision_controller = visc.VisionController()
+        # print("Vision controller initialized.")
 
         # soda stuff
         self.soda_controller = sc.SodaController()
