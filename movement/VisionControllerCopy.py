@@ -11,7 +11,7 @@ class VisionController:
     """
 
     def __init__(self):
-        self.cap = cv2.VideoCapture(1)
+        self.cap = cv2.VideoCapture(0)
         self.processor = Owlv2Processor.from_pretrained(
             "google/owlv2-base-patch16-ensemble"
         )
@@ -45,6 +45,9 @@ class VisionController:
         )
         for s in results[0]["scores"]:
             self.cans_observed.append((s, octet_number))
+
+        print("Something")
+        print(self.cans_observed)
 
         return True
 

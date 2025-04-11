@@ -39,7 +39,7 @@ def get_preprocessed_image(pixel_values):
 unnormalized_image = get_preprocessed_image(inputs.pixel_values)
 
 # Convert outputs (bounding boxes and class logits) to COCO API
-target_sizes = torch.Tensor([unnormalized_image.size[::-1]])
+target_sizes = torch.Tensor(["unnormalized_image".size[::-1]])
 results = processor.post_process_object_detection(
     outputs=outputs, target_sizes=target_sizes, threshold=0.2
 )
