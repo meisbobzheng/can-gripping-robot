@@ -1,6 +1,9 @@
 import VoiceController as vc
 import SodaController as sc
-#import VisionController as visc
+import MovementController as mc
+import VisionController as visc
+import numpy as np
+
 
 class RobotMain:
     """
@@ -9,24 +12,29 @@ class RobotMain:
 
     def __init__(self):
         # voice stuff
-        self.voice_controller = vc.VoiceController()
-        print("Voice controller initialized.")
+        # self.voice_controller = vc.VoiceController()
+        # print("Voice controller initialized.")
 
         # vision stuff
-        # self.vision_controller = visc.VisionController()
-        # print("Vision controller initialized.")
+        self.vision_controller = visc.VisionController()
+        print("Vision controller initialized.")
 
         # soda stuff
-        self.soda_controller = sc.SodaController()
-        self.soda_list = self.soda_controller.get_soda_list()
-        print("Soda controller initialized.")
-        print("Soda list:", self.soda_list)
-    
+        # self.soda_controller = sc.SodaController()
+        # self.soda_list = self.soda_controller.get_soda_list()
+        # print("Soda controller initialized.")
+        # print("Soda list:", self.soda_list)
+
+        # Movement
+        self.movement_controller = mc.MovementController()
+
     # first step
     def listen_and_identify_soda(self):
         print("Robot is listening for initial command...")
 
-        soda = self.voice_controller.listen_for_initial_command("hey robot", self.soda_list)
+        soda = self.voice_controller.listen_for_initial_command(
+            "hey robot", self.soda_list
+        )
 
         if soda is None:
             print("Error when listening for initial command.")
@@ -34,15 +42,43 @@ class RobotMain:
         else:
             print(f"Robot is picking up {soda}")
             return soda
-    
+
     def main(self):
 
         # main loop
         while True:
-            try :
+            try:
                 # Step 1: listen for initial command get soda
-                soda = self.listen_and_identify_soda()
+                # soda = self.listen_and_identify_soda()
 
+                # go to scout
+                self.movement_controller.startup()
+                self.movement_controller.scout_pos()
+
+                # rotate and find can in quadrants
+
+                # positive is left
+                # negative is right
+
+                adjustment = self.vision_controller.center_the_frame(
+                    "a green can of sprite"
+                )
+                adjustment = -adjustment
+                # 12% -> 30                adjustment = -adjustment  # its flipped
+
+                # pi * 2.5 * 12 / 180
+
+                # 15 % -> 40
+
+                adjust_factor = 0.2
+                radian_adjustment = np.pi * adjust_factor * adjustment / 180
+
+                self.movement_controller.rotate_waist(radian_adjustment)
+
+                # extend and grip can
+                # self.movement_controller.extend(0.2)
+                # self.movement_controller.grip()
+                # self.movement_controller.shutdown()
 
             except Exception as e:
                 print(e)
@@ -57,14 +93,14 @@ class RobotMain:
 
             # return to start position
 
-            # extend arm 
+            # extend arm
 
             # listen for drop command
 
             # release can and return to start
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     robot = RobotMain()
     robot.main()
 

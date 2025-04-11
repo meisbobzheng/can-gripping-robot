@@ -2,37 +2,47 @@ from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_s
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 import math
 
+
 class MovementController:
     """
-    Controller for the robot arm, and all movement. 
+    Controller for the robot arm, and all movement.
     """
+
     def __init__(self):
         self.bot = InterbotixManipulatorXS(
-            robot_model="wx250",
+            robot_model="wx250s",
             group_name="arm",
-            gripper_name="gripper",)
-        
+            gripper_name="gripper",
+        )
+
     def startup(self) -> None:
         robot_startup()
-        self.bot.arm.go_to_home_pose()
         print("robot moved to home")
 
     def shutdown(self) -> None:
-        self.bot.arm.go_to_home_pose()
         robot_shutdown()
         print("robot is going to sleep")
 
+    def scout_pos(self):
+        self.bot.arm.go_to_sleep_pose()
+        self.bot.gripper.release()
+        self.bot.arm.set_ee_pose_components(x=0.27, z=0.07)
 
-    # Extneds the arm forward to (kind of the distance, not sure units)
-    def extend_arm_forward(distance):
-        pass
+    def extend(self, distance):
+        # roughly .1 to .4 is pretty good we can test
+        self.bot.arm.set_ee_cartesian_trajectory(x=distance)
 
-    def extend(self):
-        # full extension
-        pass
+    # Rotate waist by an angle (radian)
+    # positive is left, negative is right
+    def rotate_waist(self, angle):
+        self.bot.arm.set_single_joint_position("waist", angle)
+
+    def grip(self):
+        self.bot.gripper.set_pressure(0.9)
+        self.bot.gripper.grasp()
 
     # Roughly moves to a position x,y
-    def move_to(self, x, y ,z):
+    def move_to(self, x, y, z):
         pass
 
     def pick_up_can(self):
@@ -43,7 +53,6 @@ class MovementController:
 
     def scan_for_cans(self):
         pass
-
 
     # calculates the position the arm should go to before moving forward to grab can
     def calculate_first_pos(can_x, can_y):
@@ -61,4 +70,3 @@ class MovementController:
 
         pos_y = (can_y / can_x) * percent_x_pos + 0
         return percent_x_pos, pos_y
-
