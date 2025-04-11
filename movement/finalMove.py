@@ -80,13 +80,13 @@ if __name__ == "__main__":
 
     # Need multiprocessing so camera and robot can run at same time
 
-    robot_total()
+    # robot_total()
 
-    # p1 = Process(target=camera_start)
-    # p2 = Process(target=robot_total)
+    p1 = Process(target=camera_start)
+    p2 = Process(target=robot_total)
 
-    # p1.start()
-    # p2.start()
+    p1.start()
+    p2.start()
 
-    # p1.join()
-    # p2.join()
+    p1.join()
+    p2.join()
