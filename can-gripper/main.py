@@ -47,6 +47,7 @@ class RobotMain:
             return soda
 
     def scan_sections(self):
+        print("Beginning scan sections")
         num_sections = 4
         waist_index = self.movement_controller.bot.arm.info_index_map["waist"]
         i = 0
@@ -155,7 +156,14 @@ class RobotMain:
             self.movement_controller.bot.arm.set_joint_positions(joints)
             self.movement_controller.return_to_home()
 
+            # Release command (say "DROP")
+            if self.voice_controller.listen_for_final_command():
+                self.movement_controller.release()
+
+
             self.movement_controller.shutdown()
+
+
 
         except Exception as e:
             print(e)

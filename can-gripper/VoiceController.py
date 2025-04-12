@@ -67,3 +67,39 @@ class VoiceController:
                     except sr.RequestError as e:
                         print(f"Google error: {e}")
                         return None
+
+
+    def listen_for_final_command(self, trigger="drop") -> bool | None:
+        """
+        Listens for an initial trigger phrase (e.g., 'hey robot'), then a follow-up sentence
+        that contains one of the target keywords. If 'cancel' or 'exit' is heard, it resets.
+
+        :param trigger: trigger phrase to start the keyword listener
+        :param keywords: list of command keywords to match in follow-up
+        :return: matched keyword if found, or None if canceled or error
+        """
+
+        with self.mic as source:
+            self.recognizer.adjust_for_ambient_noise(source)
+
+            # Step 1: Listen for the trigger
+            print(f"Listening for trigger phrase: '{trigger}'...")
+            while True:
+                audio = self.recognizer.listen(source)
+                try:
+                    result = self.recognizer.recognize_google(audio)
+                    lowercase_phrase = result.lower()
+
+                    print(f"Heard: {lowercase_phrase}")
+
+                    if trigger.lower() in lowercase_phrase:
+                        print("Drop detected.")
+                        break
+                except sr.UnknownValueError:
+                    print("Didn't catch that.")
+                    continue
+                except sr.RequestError as e:
+                    print(f"Google error: {e}")
+                    return None
+                
+            return True

@@ -46,6 +46,9 @@ class MovementController:
         self.bot.gripper.set_pressure(0.9)
         self.bot.gripper.grasp()
 
+    def release(self):
+        self.bot.gripper.release()
+        
     # Roughly moves to a position x,y
     def move_to(self, x, y, z):
         pass
