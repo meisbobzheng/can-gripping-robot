@@ -18,7 +18,7 @@ class VisionController:
         self.model = Owlv2ForObjectDetection.from_pretrained(
             "google/owlv2-base-patch16-ensemble"
         )
-        self.can_height = 0.112
+        self.can_height = 1.12  # .112
         self.focal_length = 941.13663157
         # list of tuples (confidence_score of the can, octet number)
         self.cans_observed = []
@@ -35,6 +35,8 @@ class VisionController:
         """
         for _ in range(100):
             _, frame = self.cap.read()
+
+        cv2.imwrite("frame.jpeg", frame)
 
         texts = [[can_description]]
         inputs = self.processor(text=texts, images=frame, return_tensors="pt")
@@ -123,6 +125,6 @@ class VisionController:
         camera_can_height = abs(y1 - y2)
 
         distance = (
-            self.focal_length + self.can_height
+            self.focal_length * self.can_height
         ) / camera_can_height  # No idea what units these are in
         return distance

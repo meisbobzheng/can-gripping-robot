@@ -1,6 +1,7 @@
 from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_startup
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 import math
+import time
 
 
 class MovementController:
@@ -28,9 +29,13 @@ class MovementController:
         self.bot.gripper.release()
         self.bot.arm.set_ee_pose_components(x=0.27, z=0.07)
 
+    ## DONT USE THIS FUNCTION
     def extend(self, distance):
         # roughly .1 to .4 is pretty good we can test
-        self.bot.arm.set_ee_cartesian_trajectory(x=distance)
+        self.bot.arm.set_ee_cartesian_trajectory(x=distance, moving_time=2)
+        time.sleep(3)
+        # self.bot.gripper.grasp()
+        # self.bot.arm.go_to_home_pose()
 
     # Rotate waist by an angle (radian)
     # positive is left, negative is right
@@ -49,7 +54,7 @@ class MovementController:
         pass
 
     def return_to_home(self):
-        pass
+        self.bot.arm.go_to_home_pose()
 
     def scan_for_cans(self):
         pass
