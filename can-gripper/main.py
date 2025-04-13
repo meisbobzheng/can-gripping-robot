@@ -31,8 +31,8 @@ class RobotMain:
         self.movement_controller = mc.MovementController()
 
         # Number of sections to check
-        # should be 14?
-        self.num_sections = 14
+        # should be 13?
+        self.num_sections = 13
         self.section_rotate_dist = np.pi / 8
 
     # first step
@@ -166,11 +166,6 @@ class RobotMain:
             self.movement_controller.return_to_home()
 
             self.movement_controller.wait_for_drop()
-
-            # voice
-            # # Release command (say "DROP")
-            # if self.voice_controller.listen_for_final_command():
-            #     self.movement_controller.release()
 
             self.movement_controller.bot.arm.go_to_sleep_pose()
 
