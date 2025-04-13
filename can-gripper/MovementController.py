@@ -82,13 +82,10 @@ class MovementController:
     
     def wait_for_drop(self) -> bool :
         # sleep 1 second to let stabilize
-        time.sleep(1)
 
-        start_effort = self.bot.arm.get_joint_efforts()[0]
+        time.sleep(5)
 
-        last_effort = 0
-        max_effort = 0
-
+        start_effort = self.bot.arm.get_join_efforts()[0]
         start_time = time.time()
         
         while (True):
@@ -96,20 +93,12 @@ class MovementController:
                 self.bot.gripper.release()
                 return False  # Timed out
             
-            joint_efforts = self.bot.arm.get_joint_efforts()
-            current_effort = abs(joint_efforts[0])
+            current_effort = self.bot.arm.get_joint_efforts()[0]
 
-            if (current_effort - last_effort > 30):
+            if (abs(current_effort - start_effort) > 15):
                 self.bot.gripper.release()
                 return True
             
-            if (current_effort > max_effort):
-                max_effort = current_effort
 
-            if (max_effort - start_effort > 50):
-                self.bot.gripper.release()
-                return True
-            
-            last_effort = current_effort
             
 
