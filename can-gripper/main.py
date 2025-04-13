@@ -33,7 +33,7 @@ class RobotMain:
         # Number of sections to check
         # should be 14?
         self.num_sections = 14
-        self.section_rotate_dist = np.pi / 4
+        self.section_rotate_dist = np.pi / 8
 
     # first step
     def listen_and_identify_soda(self):
@@ -139,7 +139,7 @@ class RobotMain:
             # Max should be around .4, test it a bit and set that as max with this
 
             estimated_distance = self.vision_controller.estimate_distance_to_can(
-                max(self.curr_soda, 0.4)
+                self.curr_soda
             )
 
             print("Estimated distance", estimated_distance)
@@ -150,6 +150,7 @@ class RobotMain:
             # Maybe add a little to this so it overshoots
             distance_to_move = estimated_distance / distance_scale_factor
 
+            distance_to_move = min(0.4, distance_to_move)
             self.movement_controller.bot.arm.set_ee_cartesian_trajectory(
                 x=distance_to_move, moving_time=2
             )
@@ -163,6 +164,15 @@ class RobotMain:
 
             self.movement_controller.bot.arm.set_joint_positions(joints)
             self.movement_controller.return_to_home()
+
+            self.movement_controller.wait_for_drop()
+
+            # voice
+            # # Release command (say "DROP")
+            # if self.voice_controller.listen_for_final_command():
+            #     self.movement_controller.release()
+
+            self.movement_controller.bot.arm.go_to_sleep_pose()
 
             self.movement_controller.shutdown()
 

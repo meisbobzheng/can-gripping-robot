@@ -3,34 +3,21 @@ from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 import numpy as np
 import time
 
-
-def grip():
-    bot.gripper.set_pressure(0.9)
-    bot.gripper.grasp()
+import MovementController as mc
 
 
 if __name__ == "__main__":
 
-    bot = InterbotixManipulatorXS(
-        robot_model="wx250s",
-        group_name="arm",
-        gripper_name="gripper",
-    )
+    controller = mc.MovementController()
 
-    robot_startup()
+    controller.startup()
 
-    bot.arm.go_to_sleep_pose()
-    bot.arm.go_to_home_pose()
+    controller.bot.arm.go_to_home_pose()
     time.sleep(1)
-    grip()
 
-    # Try to detect wobble
+    controller.bot.gripper.set_pressure(0.9)
+    controller.bot.gripper.grasp()
+    controller.wait_for_drop()
 
-    while True:
-        print("joint efforts: ", bot.arm.get_joint_efforts())
-        print("--------------------------------------------")
-        print("--------------------------------------------")
-
-        time.sleep(1)
-
-    robot_shutdown()
+    controller.bot.arm.go_to_sleep_pose()
+    controller.shutdown()

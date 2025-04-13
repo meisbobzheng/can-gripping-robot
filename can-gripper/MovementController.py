@@ -1,5 +1,6 @@
 from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_startup
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
+from interbotix_xs_msgs.srv import RegisterValues, RegisterValuesRequest
 import math
 import time
 
@@ -22,7 +23,7 @@ class MovementController:
 
     def shutdown(self) -> None:
         robot_shutdown()
-        print("robot is going to sleep")
+        print("robot is going to sleep") 
 
     def scout_pos(self):
         self.bot.arm.go_to_sleep_pose()
@@ -78,3 +79,37 @@ class MovementController:
 
         pos_y = (can_y / can_x) * percent_x_pos + 0
         return percent_x_pos, pos_y
+    
+    def wait_for_drop(self) -> bool :
+        # sleep 1 second to let stabilize
+        time.sleep(1)
+
+        start_effort = self.bot.arm.get_joint_efforts()[0]
+
+        last_effort = 0
+        max_effort = 0
+
+        start_time = time.time()
+        
+        while (True):
+            if time.time() - start_time > 10:
+                self.bot.gripper.release()
+                return False  # Timed out
+            
+            joint_efforts = self.bot.arm.get_joint_efforts()
+            current_effort = abs(joint_efforts[0])
+
+            if (current_effort - last_effort > 30):
+                self.bot.gripper.release()
+                return True
+            
+            if (current_effort > max_effort):
+                max_effort = current_effort
+
+            if (max_effort - start_effort > 50):
+                self.bot.gripper.release()
+                return True
+            
+            last_effort = current_effort
+            
+
