@@ -130,8 +130,10 @@ class RobotMain:
 
             self.movement_controller.rotate_waist(radian_adjustment)
 
+            # Max should be around .4, test it a bit and set that as max with this
+
             estimated_distance = self.vision_controller.estimate_distance_to_can(
-                self.curr_soda
+                max(self.curr_soda, 0.4)
             )
 
             print("Estimated distance", estimated_distance)
@@ -160,17 +162,26 @@ class RobotMain:
             if self.voice_controller.listen_for_final_command():
                 self.movement_controller.release()
 
-
             self.movement_controller.shutdown()
-
-
 
         except Exception as e:
             print(e)
         return
 
         # find cans
+        # find cans
 
+        # move robot towards the correct can
+
+        # pick up can
+
+        # return to start position
+
+        # extend arm
+
+        # listen for drop command
+
+        # release can and return to start
         # move robot towards the correct can
 
         # pick up can

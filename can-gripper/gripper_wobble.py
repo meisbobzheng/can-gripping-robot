@@ -19,30 +19,18 @@ if __name__ == "__main__":
 
     robot_startup()
 
+    bot.arm.go_to_sleep_pose()
     bot.arm.go_to_home_pose()
-
-    bot.arm.grip()
+    time.sleep(1)
+    grip()
 
     # Try to detect wobble
 
     while True:
-        print("Finger pos: ", bot.gripper.get_finger_position())
-        print('--------------------------------------------')
-        print("Effort: ", bot.gripper.get_gripper_effort())
-        print('--------------------------------------------')
-        print("gripper pos: ", bot.gripper.get_gripper_position())
-        print('--------------------------------------------')
-        print("gripper vel: ", bot.gripper.get_gripper_velocity())
-        print('--------------------------------------------')
         print("joint efforts: ", bot.arm.get_joint_efforts())
-        print('--------------------------------------------')
-        print("joint pos: ", bot.arm.get_joint_positions())
-        print('--------------------------------------------')
+        print("--------------------------------------------")
+        print("--------------------------------------------")
 
         time.sleep(1)
-
-
-
-    bot.gripper.
 
     robot_shutdown()
