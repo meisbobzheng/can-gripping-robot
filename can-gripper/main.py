@@ -30,6 +30,11 @@ class RobotMain:
         # Movement
         self.movement_controller = mc.MovementController()
 
+        # Number of sections to check
+        # should be 13?
+        self.num_sections = 13
+        self.section_rotate_dist = np.pi / 8
+
     # first step
     def listen_and_identify_soda(self):
         print("Robot is listening for initial command...")
@@ -53,20 +58,21 @@ class RobotMain:
 
     def scan_sections(self):
         print("Beginning scan sections")
-        num_sections = 4
         waist_index = self.movement_controller.bot.arm.info_index_map["waist"]
         i = 0
-        while i < num_sections:
+        while i < self.num_sections:
 
             self.vision_controller.get_can_position(self.curr_soda, i)
 
-            if i != num_sections - 1:
+            if i != self.num_sections - 1:
                 # Rotate to next section (Move 1/8 left for now)
                 print("going to next section")
 
                 curr_joints = self.movement_controller.bot.arm.get_joint_positions()
                 curr_waist_pos = curr_joints[waist_index]
-                self.movement_controller.rotate_waist(curr_waist_pos + (np.pi / 4))
+                self.movement_controller.rotate_waist(
+                    curr_waist_pos + (self.section_rotate_dist)
+                )
             i += 1
 
     def get_max_confidence_section(self, tuple_list):
@@ -106,7 +112,7 @@ class RobotMain:
             # Go to the section with max confidence:
 
             print("SECTION TO GO TO", section)
-            section_waist_angle = start_rotation + (section * np.pi / 4)
+            section_waist_angle = start_rotation + (section * self.section_rotate_dist)
             self.movement_controller.rotate_waist(section_waist_angle)
 
             # Once at section, center frame and grab
@@ -136,7 +142,7 @@ class RobotMain:
             # Max should be around .4, test it a bit and set that as max with this
 
             estimated_distance = self.vision_controller.estimate_distance_to_can(
-                max(self.curr_soda, 0.4)
+                self.curr_soda
             )
 
             print("Estimated distance", estimated_distance)
@@ -147,6 +153,7 @@ class RobotMain:
             # Maybe add a little to this so it overshoots
             distance_to_move = estimated_distance / distance_scale_factor
 
+            distance_to_move = min(0.4, distance_to_move)
             self.movement_controller.bot.arm.set_ee_cartesian_trajectory(
                 x=distance_to_move, moving_time=2
             )
@@ -161,13 +168,9 @@ class RobotMain:
             self.movement_controller.bot.arm.set_joint_positions(joints)
             self.movement_controller.return_to_home()
 
-
             self.movement_controller.wait_for_drop()
 
-            # voice
-            # # Release command (say "DROP")
-            # if self.voice_controller.listen_for_final_command():
-            #     self.movement_controller.release()
+            self.movement_controller.bot.arm.go_to_sleep_pose()
 
             self.movement_controller.shutdown()
 
