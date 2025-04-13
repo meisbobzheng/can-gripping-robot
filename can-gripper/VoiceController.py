@@ -9,7 +9,7 @@ class VoiceController:
         self.mic = sr.Microphone()
         self.exit_keywords = ["cancel", "exit"]
 
-    def listen_for_initial_command(self, trigger: str, keywords: list[str]) -> str | None:
+    def listen_for_initial_command(self, trigger: str) -> bool | None:
         """
         Listens for an initial trigger phrase (e.g., 'hey robot'), then a follow-up sentence
         that contains one of the target keywords. If 'cancel' or 'exit' is heard, it resets.
@@ -18,7 +18,6 @@ class VoiceController:
         :param keywords: list of command keywords to match in follow-up
         :return: matched keyword if found, or None if canceled or error
         """
-        all_keywords = [kw.lower() for kw in keywords + self.exit_keywords]
 
         with self.mic as source:
             self.recognizer.adjust_for_ambient_noise(source)
@@ -36,7 +35,7 @@ class VoiceController:
 
                         if trigger.lower() in lowercase_phrase:
                             print("Trigger detected.")
-                            break
+                            return True
                     except sr.UnknownValueError:
                         print("Didn't catch that.")
                         continue
@@ -44,6 +43,21 @@ class VoiceController:
                         print(f"Google error: {e}")
                         return None
 
+    def listen_for_soda(self, keywords: list[str]) -> str | None:
+        """
+        Listens for an initial trigger phrase (e.g., 'hey robot'), then a follow-up sentence
+        that contains one of the target keywords. If 'cancel' or 'exit' is heard, it resets.
+
+        :param trigger: trigger phrase to start the keyword listener
+        :param keywords: list of command keywords to match in follow-up
+        :return: matched keyword if found, or None if canceled or error
+        """
+        all_keywords = [kw.lower() for kw in keywords + self.exit_keywords]
+
+        with self.mic as source:
+            self.recognizer.adjust_for_ambient_noise(source)
+
+            while True:
                 # Step 2: Listen for follow-up sentence
                 print("Listening for follow-up command...")
                 while True:
@@ -67,7 +81,6 @@ class VoiceController:
                     except sr.RequestError as e:
                         print(f"Google error: {e}")
                         return None
-
 
     def listen_for_final_command(self, trigger="drop") -> bool | None:
         """

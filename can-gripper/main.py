@@ -34,8 +34,13 @@ class RobotMain:
     def listen_and_identify_soda(self):
         print("Robot is listening for initial command...")
 
-        soda = self.voice_controller.listen_for_initial_command(
-            "hey robot", self.soda_list
+        self.voice_controller.listen_for_initial_command("hey robot")
+
+        self.movement_controller.startup()
+        self.movement_controller.scout_pos()
+
+        soda = self.voice_controller.listen_for_soda(
+            self.soda_list
         )
 
         if soda is None:
@@ -83,8 +88,6 @@ class RobotMain:
             # self.curr_soda = self.soda_controller.get_soda_command("sprite")
 
             # go to scout
-            self.movement_controller.startup()
-            self.movement_controller.scout_pos()
 
             # Start at back right section
             start_rotation = 3 * -np.pi / 4
