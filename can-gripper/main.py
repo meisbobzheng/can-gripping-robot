@@ -158,9 +158,13 @@ class RobotMain:
             self.movement_controller.bot.arm.set_joint_positions(joints)
             self.movement_controller.return_to_home()
 
-            # Release command (say "DROP")
-            if self.voice_controller.listen_for_final_command():
-                self.movement_controller.release()
+
+            self.movement_controller.wait_for_drop()
+
+            # voice
+            # # Release command (say "DROP")
+            # if self.voice_controller.listen_for_final_command():
+            #     self.movement_controller.release()
 
             self.movement_controller.shutdown()
 
