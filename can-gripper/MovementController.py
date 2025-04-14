@@ -2,6 +2,7 @@ from interbotix_common_modules.common_robot.robot import robot_shutdown, robot_s
 from interbotix_xs_modules.xs_robot.arm import InterbotixManipulatorXS
 import math
 import time
+import numpy as np
 
 
 class MovementController:
@@ -78,6 +79,9 @@ class MovementController:
 
         pos_y = (can_y / can_x) * percent_x_pos + 0
         return percent_x_pos, pos_y
+
+    def acknowledge(self):
+        self.bot.arm.set_single_joint_position("wrist_angle", -np.pi / 6)
 
     def wait_for_drop(self) -> bool:
         # sleep 1 second to let stabilize

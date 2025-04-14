@@ -41,12 +41,9 @@ class RobotMain:
 
         self.voice_controller.listen_for_initial_command("hey robot")
 
-        self.movement_controller.startup()
-        self.movement_controller.scout_pos()
+        self.movement_controller.acknowledge()
 
-        soda = self.voice_controller.listen_for_soda(
-            self.soda_list
-        )
+        soda = self.voice_controller.listen_for_soda(self.soda_list)
 
         if soda is None:
             print("Error when listening for initial command.")
@@ -94,6 +91,8 @@ class RobotMain:
             # self.curr_soda = self.soda_controller.get_soda_command("sprite")
 
             # go to scout
+            self.movement_controller.startup()
+            self.movement_controller.scout_pos()
 
             # Start at back right section
             start_rotation = 3 * -np.pi / 4
@@ -155,7 +154,7 @@ class RobotMain:
 
             distance_to_move = min(0.4, distance_to_move)
             self.movement_controller.bot.arm.set_ee_cartesian_trajectory(
-                x=distance_to_move, moving_time=2
+                x=distance_to_move, moving_time=2, z=0.02
             )
             time.sleep(4)
 

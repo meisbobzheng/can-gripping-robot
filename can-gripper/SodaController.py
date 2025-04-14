@@ -18,10 +18,10 @@ class SodaController:
         elif soda == self.COKE:
             return "A red soda can with COKE as the label"
         elif soda == self.LEMONADE:
-            return "A blue soda can with Minute Maid Lemonade as the label"
+            return "A soda can with Minute Maid as the label"
         elif soda == self.FANTA:
             return "An orange soda can with FANTA as the label"
         elif soda == self.ROOT_BEER:
-            return "A silver soda can with Barq's in cursive font as the label"
+            return "A silver soda can with Barq's as the label"
         else:
             raise Exception("Invalid soda")
